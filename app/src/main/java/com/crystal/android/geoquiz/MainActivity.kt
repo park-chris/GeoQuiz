@@ -2,7 +2,6 @@ package com.crystal.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -11,7 +10,6 @@ import android.widget.Toast
 class MainActivity : AppCompatActivity() {
 
     private lateinit var trueButton: Button
-
     private lateinit var falseButton: Button
     private lateinit var nextButton: Button
     private lateinit var previousButton: Button
@@ -26,12 +24,15 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_asia,true)
     )
 
+    private var userCheckAnswer = mutableListOf(false,false,false,false,false,false)
+
     private var currentIndex = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
 
         trueButton = findViewById(R.id.true_button)
@@ -52,6 +53,8 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+
+
         previousButton.setOnClickListener {
             currentIndex = (currentIndex - 1 ) % questionBank.size
             if (currentIndex < 0) {
@@ -71,18 +74,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateQuestion()
-
     }
 
-//    현재 인덱스에 따라 문제질문을 업데이트해주는 함수
+    //    현재 인덱스에 따라 문제질문을 업데이트해주는 함수
     private fun updateQuestion(){
         val questionTextResId = questionBank[currentIndex].textResId
         questionTextView.setText(questionTextResId)
+
+        if (userCheckAnswer[currentIndex]) {
+            trueButton.isEnabled = false
+            falseButton.isEnabled = false
+        } else {
+            trueButton.isEnabled = true
+            falseButton.isEnabled = true
+        }
+
     }
 
-//    리스트에 있는 답과 사용자가 찍은 답이 일치하는지 체크하는 함수
+    //    리스트에 있는 답과 사용자가 찍은 답이 일치하는지 체크하는 함수
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
+
+        if (userAnswer == correctAnswer) {
+            userCheckAnswer[currentIndex] = true
+            trueButton.isEnabled = false
+            falseButton.isEnabled = false
+        }
 
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
@@ -92,4 +109,7 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
+
 }
+
+
