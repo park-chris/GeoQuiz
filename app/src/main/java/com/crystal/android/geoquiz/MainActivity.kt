@@ -2,6 +2,7 @@ package com.crystal.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var falseButton: Button
     private lateinit var nextButton: Button
+    private lateinit var previousButton: Button
     private lateinit var questionTextView: TextView
 
     private var questionBank = listOf(
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
+        previousButton = findViewById(R.id.previous_button)
         questionTextView = findViewById(R.id.question_text_view)
 
         trueButton.setOnClickListener { view: View ->
@@ -47,6 +50,14 @@ class MainActivity : AppCompatActivity() {
 
             checkAnswer(false)
 
+        }
+
+        previousButton.setOnClickListener {
+            currentIndex = (currentIndex - 1 ) % questionBank.size
+            if (currentIndex < 0) {
+                currentIndex = questionBank.size - 1
+            }
+            updateQuestion()
         }
 
         nextButton.setOnClickListener {
