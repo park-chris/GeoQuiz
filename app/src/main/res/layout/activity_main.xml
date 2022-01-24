@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- tools:text 속성을 사용하기 위해 루트 태그(LinearLayout)에 tools 네임스페이스 추가 -->
+<!-- tools 네임 스페이스 속성들은 앱이 장치에서 실행되어 위젯들이 화면에 나타날때는 무시된다.
+     android:text : 지정된 값은 런타임에 나타남
+     tools:text : 지정된 값은 디자인 시에 보기 위해 사용 -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
 
     <TextView
+        android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="24dp"
-        android:text="@string/question_text" />
+        android:gravity="center"
+        tools:text="@string/question_australia"/>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -30,5 +39,13 @@
             android:text="@string/false_button" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/arrow_right"
+        android:drawablePadding="4dp"
+        android:text="@string/next_button" />
 
 </LinearLayout>
