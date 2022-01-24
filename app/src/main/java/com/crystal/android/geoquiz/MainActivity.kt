@@ -2,6 +2,7 @@ package com.crystal.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         nextButton.setOnClickListener {
+
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
         }
@@ -101,13 +103,32 @@ class MainActivity : AppCompatActivity() {
             falseButton.isEnabled = false
         }
 
-        val messageResId = if (userAnswer == correctAnswer) {
-            R.string.correct_toast
+        if (currentIndex == 5) {
+
+            var totalScore: Double = 0.0
+
+            for (i in userCheckAnswer) {
+                if (i){
+                    totalScore++
+                }
+            }
+
+            val totalPercentage:Double = totalScore / userCheckAnswer.size * 100
+
+            Log.d("MainActivity", totalPercentage.toString())
+
+            Toast.makeText(this, totalPercentage.toString(), Toast.LENGTH_LONG).show()
+
         } else {
-            R.string.incorrect_toast
+            val messageResId = if (userAnswer == correctAnswer) {
+                R.string.correct_toast
+            } else {
+                R.string.incorrect_toast
+            }
+
+            Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
         }
 
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
 }
