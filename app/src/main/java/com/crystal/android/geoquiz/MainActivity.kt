@@ -7,6 +7,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +37,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
+/*        val provider: ViewModelProvider = ViewModelProvider(this)
+        val quizViewModel = provider.get(QuizViewModel::class.java)
+        아래 한줄로 축약 */
+        val quizViewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
+        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -114,8 +121,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             val totalPercentage:Double = totalScore / userCheckAnswer.size * 100
-
-            Log.d("MainActivity", totalPercentage.toString())
 
             Toast.makeText(this, totalPercentage.toString(), Toast.LENGTH_LONG).show()
 
