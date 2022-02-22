@@ -1,5 +1,7 @@
 package com.crystal.android.geoquiz
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 
 // Bundle 객체에 저장될 데이터의 키
 private const val KEY_INDEX = "index"
+private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var falseButton: Button
     private lateinit var nextButton: Button
     private lateinit var previousButton: Button
+    private lateinit var cheatButton: Button
     private lateinit var questionTextView: TextView
     private val quizViewModel:QuizViewModel by lazy {
         ViewModelProvider(this).get(QuizViewModel::class.java)
@@ -43,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
         previousButton = findViewById(R.id.previous_button)
+        cheatButton = findViewById(R.id.cheat_button)
         questionTextView = findViewById(R.id.question_text_view)
 
         trueButton.setOnClickListener { view: View ->
@@ -70,6 +75,16 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
+
+        cheatButton.setOnClickListener {
+            // CheatActivity를 시작시킴
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+
+            // CheatActivity의 companion object의 함수 실행
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        }
+
         questionTextView.setOnClickListener {
             quizViewModel.moveToNext()
             updateQuestion()
@@ -78,9 +93,23 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
     }
 
+    override fun onActivityResult(requestCode: Int,
+                                  resultCode: Int,
+                                  data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            Log.d("MainActivity", "resultcode 실행됨")
+        }
+    }
+
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         super.onSaveInstanceState(savedInstanceState)
-        Log.d("MainActivity", "onSaveInstanceState")
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
@@ -103,38 +132,19 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = quizViewModel.currentQuestionAnswer
 
-/*        if (userAnswer == correctAnswer) {
-            userCheckAnswer[currentIndex] = true
-            trueButton.isEnabled = false
-            falseButton.isEnabled = false
-        }*/
+        val messageResId = when {
+            quizViewModel.isCheater -> R.string.judgment_toast
+            userAnswer == correctAnswer -> R.string.correct_toast
+            else -> R.string.incorrect_toast
+        }
 
-/*        if (currentIndex == 5) {
-
-            var totalScore: Double = 0.0
-
-            for (i in userCheckAnswer) {
-                if (i){
-                    totalScore++
-                }
-            }
-
-            val totalPercentage:Double = totalScore / userCheckAnswer.size * 100
-
-            Toast.makeText(this, totalPercentage.toString(), Toast.LENGTH_LONG).show()
-
-        }*/
-
-        val messageResId = if (userAnswer == correctAnswer) {
-                R.string.correct_toast
-            } else {
-                R.string.incorrect_toast
-            }
-
-            Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
 
 
     }
+
+
+
 
 }
 

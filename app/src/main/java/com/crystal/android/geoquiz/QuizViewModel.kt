@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 class QuizViewModel : ViewModel() {
 
     var currentIndex = 0
+    var isCheater = false
 
     private var questionBank = listOf(
         Question(R.string.question_australia, true),
