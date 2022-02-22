@@ -2,12 +2,15 @@ package com.crystal.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 
+// Bundle 객체에 저장될 데이터의 키
+private const val KEY_INDEX = "index"
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +27,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+// Bundle 객체에 저장된 값을 확인해 값이 있으면 값을 currentIndex에 저장
+// 그렇지 않고 키("index")가 Bundle 객체에 없거나,
+// Bundle 객체 참조가 null이면 currentIndex의 값을 0을 설정
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+
+        if (currentIndex != quizViewModel.currentIndex) {
+            quizViewModel.currentIndex = currentIndex
+        }
+
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -62,6 +76,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateQuestion()
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        Log.d("MainActivity", "onSaveInstanceState")
+        savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
     //    현재 인덱스에 따라 문제질문을 업데이트해주는 함수
