@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 
 // Bundle 객체에 저장될 데이터의 키
 private const val KEY_INDEX = "index"
+private const val KEY_IS_CHEAT = "isCheat"
 private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
@@ -38,10 +39,15 @@ class MainActivity : AppCompatActivity() {
 // Bundle 객체 참조가 null이면 currentIndex의 값을 0을 설정
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
 
+        val savedCheater = savedInstanceState?.getBoolean(KEY_IS_CHEAT, false) ?:false
+
+        if (savedCheater != quizViewModel.isCheater) {
+            quizViewModel.changeCheat()
+        }
+
         if (currentIndex != quizViewModel.currentIndex) {
             quizViewModel.currentIndex = currentIndex
         }
-
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -103,7 +109,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (requestCode == REQUEST_CODE_CHEAT) {
-            quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            val isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            if (isCheater) {
+                quizViewModel.changeCheat()
+            }
             Log.d("MainActivity", "resultcode 실행됨")
         }
     }
@@ -111,20 +120,13 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         super.onSaveInstanceState(savedInstanceState)
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+        savedInstanceState.putBoolean(KEY_IS_CHEAT, quizViewModel.isCheater)
     }
 
     //    현재 인덱스에 따라 문제질문을 업데이트해주는 함수
     private fun updateQuestion(){
         val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
-
-/*        if (userCheckAnswer[currentIndex]) {
-            trueButton.isEnabled = false
-            falseButton.isEnabled = false
-        } else {
-            trueButton.isEnabled = true
-            falseButton.isEnabled = true
-        }*/
 
     }
 
