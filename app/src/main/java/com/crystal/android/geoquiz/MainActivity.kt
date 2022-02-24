@@ -17,7 +17,10 @@ import androidx.lifecycle.ViewModelProvider
 // Bundle 객체에 저장될 데이터의 키
 private const val KEY_INDEX = "index"
 private const val KEY_IS_CHEAT = "isCheat"
+private const val KEY_CHEAT_NUMBER = "cheatNumber"
 private const val REQUEST_CODE_CHEAT = 0
+
+private var cheatNumber: Int = 0
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,22 +30,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var previousButton: Button
     private lateinit var cheatButton: Button
     private lateinit var questionTextView: TextView
+    private lateinit var extraCheatTextView: TextView
     private val quizViewModel:QuizViewModel by lazy {
         ViewModelProvider(this).get(QuizViewModel::class.java)
     }
+
+
+
 // RestrictedApi 린트 검사를 중지하는 코드
     @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
 // Bundle 객체에 저장된 값을 확인해 값이 있으면 값을 currentIndex에 저장
 // 그렇지 않고 키("index")가 Bundle 객체에 없거나,
 // Bundle 객체 참조가 null이면 currentIndex의 값을 0을 설정
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
-
         val savedCheater = savedInstanceState?.getBoolean(KEY_IS_CHEAT, false) ?:false
+        val savedCheatNumber = savedInstanceState?.getInt(KEY_CHEAT_NUMBER, 0) ?:0
 
         if (savedCheater != quizViewModel.isCheater) {
             quizViewModel.changeCheat()
@@ -52,12 +58,23 @@ class MainActivity : AppCompatActivity() {
             quizViewModel.currentIndex = currentIndex
         }
 
+    if (cheatNumber != savedCheatNumber) {
+        cheatNumber = savedCheatNumber
+        if (cheatNumber >= 3) {
+            cheatButton.isEnabled = false
+        }
+    }
+
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
         previousButton = findViewById(R.id.previous_button)
         cheatButton = findViewById(R.id.cheat_button)
         questionTextView = findViewById(R.id.question_text_view)
+        extraCheatTextView = findViewById(R.id.extra_cheat_text_view)
+
+
+        checkCheat()
 
         trueButton.setOnClickListener { view: View ->
 
@@ -75,12 +92,14 @@ class MainActivity : AppCompatActivity() {
 
         previousButton.setOnClickListener {
             quizViewModel.moveToPrevious()
+            checkCheat()
             updateQuestion()
         }
 
         nextButton.setOnClickListener {
 
             quizViewModel.moveToNext()
+            checkCheat()
             updateQuestion()
         }
 
@@ -125,8 +144,8 @@ class MainActivity : AppCompatActivity() {
             val isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
             if (isCheater) {
                 quizViewModel.changeCheat()
+                cheatNumber += 1
             }
-            Log.d("MainActivity", "resultcode 실행됨")
         }
     }
 
@@ -134,6 +153,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(savedInstanceState)
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
         savedInstanceState.putBoolean(KEY_IS_CHEAT, quizViewModel.isCheater)
+        savedInstanceState.putInt(KEY_CHEAT_NUMBER, cheatNumber)
     }
 
     //    현재 인덱스에 따라 문제질문을 업데이트해주는 함수
@@ -158,6 +178,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun checkCheat() {
+        if (cheatNumber >= 3) {
+            cheatButton.isEnabled = false
+        }
+        val extra = 3- cheatNumber
+        extraCheatTextView.text = "남은 커닝 횟수 : $extra"
+
+        Log.d("MainActivity", "resultcode 실행됨. cheatNumber : $cheatNumber")
+    }
 
 
 
