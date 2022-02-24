@@ -3,6 +3,7 @@ package com.crystal.android.geoquiz
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -14,6 +15,7 @@ private const val EXTRA_ANSWER_IS_TRUE = "com.crystal.android.geoquiz.answer_is_
 class CheatActivity : AppCompatActivity() {
 
     private lateinit var answerTextView: TextView
+    private lateinit var apiTextView: TextView
     private lateinit var showAnswerButton: Button
 
     private var answerIsTrue = false
@@ -23,10 +25,17 @@ class CheatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cheat)
 
+
+
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
 
         answerTextView = findViewById(R.id.answer_text_view)
+        apiTextView = findViewById(R.id.api_text_view)
         showAnswerButton = findViewById(R.id.show_anwser_button)
+
+        var currentApi = Build.VERSION.SDK_INT.toString()
+
+        apiTextView.text = "API 레벨 $currentApi"
 
         showAnswerButton.setOnClickListener {
 
@@ -40,7 +49,6 @@ class CheatActivity : AppCompatActivity() {
         }
 
     }
-
 
 
 // MainActivity에서 사용가능하게 companion object 안에 CheatActivity가 필요로 하는 엑스트라 데이터를 갖는 인텐트 생성
